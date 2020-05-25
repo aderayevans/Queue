@@ -1,0 +1,10 @@
+void makeNull_Tree (Tree &T);
+int EmptyTree(Tree T);
+Node Parent(Node n, Tree T);
+DataType Label_Node(Node n,Tree T);
+Node Root(Tree T);
+Node LeftMostChild(Node n, Tree T);
+Node RightSibling(Node n,Tree T);
+void PreOrder(Node n,Tree T);
+void InOrder(Node n, Tree T);
+void PostOrder(Node n,Tree T);
