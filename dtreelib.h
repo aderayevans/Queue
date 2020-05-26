@@ -1,17 +1,19 @@
 #include <iostream>
 #include <stack>
+#include <queue>
 
 typedef char DataType;
 //const int null = -1;
 struct Cell {
     DataType data;
+    Cell* par;
     Cell* lmc;
     Cell* rsl;
 };
 typedef Cell* Node;
 typedef Node Tree;
 //declarations
-Node create(DataType val, Tree lmc, Tree rsl);
+void create(Node &node, DataType val, Node par, Tree lmc, Tree rsl);
 void makeNull_Tree (Tree &T);
 bool emptyTree(Tree T);
 Node parent(Node n, Tree T);
@@ -23,22 +25,21 @@ void preOrder(Node n,Tree T);
 void inOrder(Node n, Tree T);
 void postOrder(Node n,Tree T);
 //definitions
-Node create(DataType val, Tree lmc, Tree rsl) {
-    Node n = new Cell();
-    n->data = val;
-    n->lmc = lmc;
-    n->rsl = rsl;
-    return n;
+void create(Node &node, DataType val, Node par, Node lmc, Node rsl) {
+    node->data = val;
+    node->par = par;
+    node->lmc = lmc;
+    node->rsl = rsl;
 }
 void makeNull_Tree (Tree &T) {
-    T = NULL;
+    T = new Cell();
 }
 bool emptyTree(Tree T) {
     return T == NULL;
 }
-/*Node parent(Node n, Tree T) {
-
-}*/
+Node parent(Node n, Tree T) {
+    return n->par;
+}
 DataType label(Node n,Tree T) {
     return n->data;
 }
@@ -55,15 +56,15 @@ void preOrder(Node n,Tree T)
 {
     if (!emptyTree(T)) 
     {
-        std::stack<Node> par; //buffer, parents
+        std::stack<Node> S; //buffer, parents
         Node buf = n;
         while (true)
         {
             std::cout << label(buf, T) << ' ';
             if (buf->lmc != NULL) 
             {
-                par.push(buf);
-                buf = par.top()->lmc;
+                S.push(buf);
+                buf = S.top()->lmc;
             }
             else if (buf->rsl != NULL)
             {
@@ -73,17 +74,17 @@ void preOrder(Node n,Tree T)
             {   
                 while(true)
                 {
-                    if (par.empty()) break;
-                    else if (par.top()->rsl != NULL)
+                    if (S.empty()) break;
+                    else if (S.top()->rsl != NULL)
                     {
-                        buf = par.top()->rsl;
-                        par.pop();
+                        buf = S.top()->rsl;
+                        S.pop();
                         break;
                     }
                     else
-                        par.pop();
+                        S.pop();
                 }
-                if (par.empty())
+                if (S.empty())
                     break;
             }
         }
@@ -132,4 +133,116 @@ void postOrder(Node n,Tree T)
         i = rightSibling(i, T);
     }
     std::cout << label(n, T) << ' ';
+}
+void levelOrder(Node n, Tree T)
+{
+    std::queue<Node> Q;
+    Q.push(n);
+    while (!Q.empty()) 
+    {
+        std::cout << label(Q.front(), T) << ' ';
+        if (leftMostChild(Q.front(), T) != NULL)
+        {
+            Node child = leftMostChild(Q.front(), T);
+            Q.push(child);
+            while (rightSibling(child, T) != NULL) 
+            {
+                child = rightSibling(child, T);
+                Q.push(child);
+            }
+        }
+        Q.pop();
+    }
+}
+void showPathTo(Node n, Tree T)
+{
+    std::stack<Node> S;
+    S.push(n);
+    while(S.top()->par != NULL) {
+        S.push(S.top()->par);
+    }
+    while(!S.empty())
+    {
+        std::cout << label(S.top(), T) << ' ';
+        S.pop();
+    }
+}
+int countPathTo(Node n, Tree T)
+{
+    int count = 0;
+    std::stack<Node> S;
+    S.push(n);
+    while(S.top() != T) {
+        S.push(S.top()->par);
+        count++;
+    }
+    return count;
+}
+int height(Tree T)
+{
+    Node lastone;
+    std::queue<Node> Q;
+    Q.push(root(T));
+    while (!Q.empty()) 
+    {
+        if (leftMostChild(Q.front(), T) != NULL)
+        {
+            Node child = leftMostChild(Q.front(), T);
+            Q.push(child);
+            while (rightSibling(child, T) != NULL) 
+            {
+                child = rightSibling(child, T);
+                Q.push(child);
+            }
+        }
+        lastone = Q.front();
+        Q.pop();
+    }
+    return countPathTo(lastone, T);
+}
+int theNumberOfLeaf(Tree T)
+{
+    std::queue<Node> Q;
+    int count = 0;
+    Q.push(root(T));
+    while (!Q.empty()) 
+    {
+        if (leftMostChild(Q.front(), T) != NULL)
+        {
+            Node child = leftMostChild(Q.front(), T);
+            Q.push(child);
+            while (rightSibling(child, T) != NULL) 
+            {
+                child = rightSibling(child, T);
+                Q.push(child);
+            }
+        }
+        else {
+            count++;
+        }
+        Q.pop();
+    }
+    return count;
+}
+int heightOfNode(Node n, Tree T)
+{
+    Node lastone;
+    std::queue<Node> Q;
+    Q.push(n);
+    while (!Q.empty()) 
+    {
+        if (leftMostChild(Q.front(), T) != NULL)
+        {
+            Node child = leftMostChild(Q.front(), T);
+            Q.push(child);
+            while (rightSibling(child, T) != NULL) 
+            {
+                child = rightSibling(child, T);
+                Q.push(child);
+            }
+        }
+        lastone = Q.front();
+        Q.pop();
+    }
+    return countPathTo(lastone, n);
 }
