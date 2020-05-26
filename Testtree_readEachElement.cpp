@@ -35,15 +35,6 @@ void readTree(Tree *T){
         myfile.close();
     }
     else std::cout << "Unable to open file";
-/*
-    int node;
-    printf("Nhap so node: "); scanf("%d", &node);
-    T->MaxNode = node;
-    for (int i = 0; i < node; i++) {
-        fflush(stdin);
-        printf("Node: "); scanf("%c", &T->Data[i]);
-        printf("Parent of the Node: "); scanf("%d", &T->Parent[i]);
-    }*/
 }
 
 int main(int argc, char *argv[]){

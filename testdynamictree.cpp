@@ -43,5 +43,5 @@ int main() {
     cout << endl;
     cout << height(A) << endl;
     cout << theNumberOfLeaf(A) << endl;
-    cout << heightOfNode(B, A) << endl;
+    cout << heightOfNode(J, A) << endl;
 }
