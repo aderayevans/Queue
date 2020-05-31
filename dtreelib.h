@@ -24,6 +24,16 @@ Node rightSibling(Node n,Tree T);
 void preOrder(Node n,Tree T);
 void inOrder(Node n, Tree T);
 void postOrder(Node n,Tree T);
+void levelOrder(Node n, Tree T);
+void showPathTo(Node n, Node m, Tree T);
+int countPathTo(Node n, Node m, Tree T);
+int height(Tree T);
+int theNumberOfLeaf(Tree T);
+int heightOfNode(Node n, Tree T);
+bool isSibling(Node n, Node m);
+bool isAncestor(Node n, Node m);
+int sonsOfNode(Node n, Tree T);
+int degreeOfATree(Tree T);
 //definitions
 void create(Node &node, DataType val, Node par, Node lmc, Node rsl) {
     node->data = val;
@@ -54,30 +64,30 @@ Node rightSibling(Node n,Tree T) {
 }
 void preOrder(Node n,Tree T) 
 {
-    if (!emptyTree(T)) 
+    if (n != NULL) 
     {
         std::stack<Node> S; //buffer, parents
         Node buf = n;
         while (true)
         {
             std::cout << label(buf, T) << ' ';
-            if (buf->lmc != NULL) 
+            if (leftMostChild(buf, T) != NULL) 
             {
                 S.push(buf);
-                buf = S.top()->lmc;
+                buf = leftMostChild(S.top(), T);
             }
-            else if (buf->rsl != NULL)
+            else if (rightSibling(buf, T) != NULL)
             {
-                buf = buf->rsl;
+                buf = rightSibling(buf, T);
             }
             else
             {   
                 while(true)
                 {
                     if (S.empty()) break;
-                    else if (S.top()->rsl != NULL)
+                    else if (rightSibling(S.top(), T) != NULL)
                     {
-                        buf = S.top()->rsl;
+                        buf = rightSibling(S.top(), T);
                         S.pop();
                         break;
                     }
@@ -92,7 +102,7 @@ void preOrder(Node n,Tree T)
 }
 /*void preOrder(Node n,Tree T) 
 {
-    if(!emptyTree(T))
+    if(n != NULL)
     {
         std::cout << label(n, T) << ' ';
         Node i = leftMostChild(n, T);
@@ -126,13 +136,17 @@ void inOrder(Node n, Tree T)
 }
 void postOrder(Node n,Tree T) 
 {
-    Node i = leftMostChild(n, T);
-    while (i != NULL) 
+    if (n != NULL)
     {
-        postOrder(i, T);
-        i = rightSibling(i, T);
+        Node i = leftMostChild(n, T);
+        while (i != NULL) 
+        {
+            postOrder(i, T);
+            i = rightSibling(i, T);
+        }
+        std::cout << label(n, T) << ' ';
     }
-    std::cout << label(n, T) << ' ';
+    
 }
 void levelOrder(Node n, Tree T)
 {
@@ -154,12 +168,12 @@ void levelOrder(Node n, Tree T)
         Q.pop();
     }
 }
-void showPathTo(Node n, Tree T)
+void showPathTo(Node n, Node m, Tree T)
 {
     std::stack<Node> S;
     S.push(n);
-    while(S.top()->par != NULL) {
-        S.push(S.top()->par);
+    while(parent(S.top(), T) != parent(m, T)) {
+        S.push(parent(S.top(), T));
     }
     while(!S.empty())
     {
@@ -167,13 +181,13 @@ void showPathTo(Node n, Tree T)
         S.pop();
     }
 }
-int countPathTo(Node n, Tree T)
+int countPathTo(Node n, Node m, Tree T)
 {
     int count = 0;
     std::stack<Node> S;
     S.push(n);
-    while(S.top() != T) {
-        S.push(S.top()->par);
+    while(S.top() != m) {
+        S.push(parent(S.top(), T));
         count++;
     }
     return count;
@@ -198,7 +212,7 @@ int height(Tree T)
         lastone = Q.front();
         Q.pop();
     }
-    return countPathTo(lastone, T);
+    return countPathTo(lastone, root(T), T);
 }
 int theNumberOfLeaf(Tree T)
 {
@@ -244,5 +258,79 @@ int heightOfNode(Node n, Tree T)
         lastone = Q.front();
         Q.pop();
     }
-    return countPathTo(lastone, n);
+    return countPathTo(lastone, n, T);
+}
+bool isSibling(Node n, Node m, Tree T)
+{
+    if (parent(n, T) == parent(m, T)) return true;
+    return false;
+}
+bool isAncestor(Node n, Node m, Tree T)
+{
+    Node i = m;
+    while (parent(i, T) != NULL)
+    {
+        if (parent(i, T) == n) return true;
+        i = parent(i, T);
+    }
+    return false;
+}
+int sonsOfNode(Node n, Tree T)
+{
+    int count = 0;
+    if (leftMostChild(n, T) != NULL)
+    {
+        count++;
+        Node i = leftMostChild(n, T);
+        while(rightSibling(i, T) != NULL)
+        {
+            i = rightSibling(i, T);
+            count++;
+        }
+    }
+    return count;
+}
+int degreeOfATree(Tree T)
+{
+    int max = 0;
+    std::queue<Node> Q;
+    Q.push(root(T));
+    while (!Q.empty()) 
+    {
+        if (sonsOfNode(Q.front(), T) > max) max = sonsOfNode(Q.front(), T);
+        if (leftMostChild(Q.front(), T) != NULL)
+        {
+            Node child = leftMostChild(Q.front(), T);
+            Q.push(child);
+            while (rightSibling(child, T) != NULL) 
+            {
+                child = rightSibling(child, T);
+                Q.push(child);
+            }
+        }
+        Q.pop();
+    }
+    return max;
+}
+int oneChildParent(Tree T)
+{
+    int count = 0;
+    std::queue<Node> Q;
+    Q.push(root(T));
+    while (!Q.empty()) 
+    {
+        if (sonsOfNode(Q.front(), T) == 1) count++;
+        if (leftMostChild(Q.front(), T) != NULL)
+        {
+            Node child = leftMostChild(Q.front(), T);
+            Q.push(child);
+            while (rightSibling(child, T) != NULL) 
+            {
+                child = rightSibling(child, T);
+                Q.push(child);
+            }
+        }
+        Q.pop();
+    }
+    return count;
 }
