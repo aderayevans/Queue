@@ -16,16 +16,17 @@ void readFile(Tree &T)
 	std::ifstream ifs("bsttext.txt");
 	char ch;
 	int temp;
-    if (ifs.is_open()) {
+    if (ifs.is_open())
+    {
         while(ifs.peek() != '\n')
 		{
             ifs >> temp;
             InsertNode(temp, &T);
         }
         ifs.close();
-        }
+    }
     else 
-	{
+    {
         std::cout << "Unable to read file";
     }
 }
@@ -75,7 +76,8 @@ int theNumberOfLeaf(Tree T)
             Q.push(child);
         }
         else check++;
-        if (check == 2) {
+        if (check == 2) 
+		{
             cout << "Leaf's key: " << getKey(Q.front()) << endl;
             count++;
         }
@@ -203,7 +205,8 @@ bool isCompleted(Tree T)
                 check++;
             }
             if (check == 1) return false;
-            else if (check == 2) {
+            else if (check == 2)
+			{
                 currentLevel = levelOfNode(Q.front(), T, T);
                 if (currentLevel != height(T)) return false;
             }
